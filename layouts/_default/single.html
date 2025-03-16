@@ -15,6 +15,12 @@
 		<div class="content post__content clearfix">
 			{{ .Content }}
 		</div>
+
+		{{ partial "backlinks.html" . }}
+		<br/>
+		<br/>
+		<br/>
+
 		{{- if .Params.tags }}
 		<footer class="post__footer">
 			{{ partial "post_tags.html" . }}
