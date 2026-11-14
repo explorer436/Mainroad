@@ -1,0 +1,88 @@
+{{ define "main" }}
+<div class="graph-container">
+    <h1>Knowledge Graph</h1>
+    <p>An interactive map of notes and connections extracted from Org-roam.</p>
+    <div id="org-roam-graph" style="width: 100%; height: 600px; border: 1px solid var(--border-color);"></div>
+</div>
+
+<!-- Load D3.js v7 -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById('org-roam-graph');
+    const width = container.clientWidth;
+    const height = 600;
+
+    const svg = d3.select("#org-roam-graph")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    d3.json("{{ "graph.json" | relURL }}").then(data => {
+        // Fix 1: Correct D3 v7 id accessor function
+        const simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).id(d => d.id))
+            .force("charge", d3.forceManyBody().strength(-60))
+            .force("center", d3.forceCenter(width / 2, height / 2));
+
+        const link = svg.append("g")
+            .selectAll("line")
+            .data(data.links)
+            .join("line")
+            .attr("stroke", "var(--border-color, #999)")
+            .attr("stroke-opacity", 0.6)
+            .attr("stroke-width", 1.5);
+
+        const node = svg.append("g")
+            .selectAll("circle")
+            .data(data.nodes)
+            .join("circle")
+            .attr("r", 6)
+            .attr("fill", "var(--accent-color, #69b3a2)")
+            .call(drag(simulation));
+
+        node.append("title")
+            .text(d => d.title || "Untitled");
+
+        // Fix 2: Map the org-roam file path to your Hugo post URL structure
+        node.on("click", (event, d) => {
+            if (d.file) {
+                // Extracts filename, strips .org, and points to your Hugo posts route
+                const slug = d.file.split('/').pop().replace(/\.org$/, '');
+                window.location.href = `{{ "posts/" | relURL }}${slug}/`;
+            }
+        });
+
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+        });
+    });
+
+    function drag(simulation) {
+        return d3.drag()
+            .on("start", (event, d) => {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            })
+            .on("drag", (event, d) => {
+                d.fx = event.x;
+                d.fy = event.y;
+            })
+            .on("end", (event, d) => {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            });
+    }
+});
+</script>
+{{ end }}
