@@ -16,28 +16,20 @@
 			{{ .Content }}
 		</div>
 
-		<!-- {{ partial "backlinks.html" . }}-->
+		<!--{{ partial "backlinks.html" . }} -->
 		{{ partial "graph.html" . }}
 		<aside id="page-connections" data-page-url="{{ .RelPermalink }}">
-		<section id="backlinks-panel">
-		  <h3>Backlinks</h3>
-		  <ul id="backlinks-list">
-		    <li>Loading backlinks...</li>
-		  </ul>
-		</section>
-
-		<section id="local-graph-panel">
-		  <h3>Connected Pages</h3>
-		  <ul id="local-graph-list">
-		    <li>Loading connections...</li>
-		  </ul>
-		</section>
-	      </aside>
-	      {{- with resources.Get "js/connections.js" }}
-		{{- $js := . | js.Build (dict "minify" (not hugo.IsDevelopment)) }}
-		<script src="{{ $js.RelPermalink }}" defer></script>
-	      {{- end }}
-
+		  <section id="backlinks-panel">
+		    <h3>Backlinks</h3>
+		    <ul id="backlinks-list">
+		      <li>Loading backlinks...</li>
+		    </ul>
+		  </section>
+		</aside>
+		{{- with resources.Get "js/connections.js" }}
+		  {{- $js := . | js.Build (dict "minify" (not hugo.IsDevelopment)) }}
+		  <script src="{{ $js.RelPermalink }}" defer></script>
+		{{- end }}
 
 		<br/>
 		<br/>
