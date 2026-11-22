@@ -1,49 +1,54 @@
 {{ define "main" }}
 <main class="main" role="main">
-        <article class="post">
-                <header class="post__header">
-                        <h1 class="post__title">{{ .Title }}</h1>
-                        {{- with .Params.lead }}
-                        <p class="post__lead">{{ . }}</p>
-                        {{- end }}
-                        {{ with partial "post_meta.html" . -}}
-                        <div class="post__meta meta">{{ . }}</div>
-                        {{- end }}
-                </header>
-                {{ partial "post_thumbnail.html" (dict "class" "post" "page" .) }}
-                {{- partial "post_toc.html" . -}}
-                <div class="content post__content clearfix">
-                        {{ .Content }}
-                </div>
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">{{ .Title }}</h1>
+			{{- with .Params.lead }}
+			<p class="post__lead">{{ . }}</p>
+			{{- end }}
+			{{ with partial "post_meta.html" . -}}
+			<div class="post__meta meta">{{ . }}</div>
+			{{- end }}
+		</header>
+		{{ partial "post_thumbnail.html" (dict "class" "post" "page" .) }}
+		{{- partial "post_toc.html" . -}}
+		<div class="content post__content clearfix">
+			{{ .Content }}
+		</div>
 
-                <!-- {{ partial "backlinks.html" . }}
-                {{ partial "graph.html" . }} -->
-                <aside id="page-connections" data-page-url="{{ .RelPermalink }}">
-                        <section id="backlinks-panel">
-                        <h3>Backlinks</h3>
-                        <ul id="backlinks-list">
-                                <li>Loading backlinks...</li>
-                        </ul>
-                        </section>
+		<!-- {{ partial "backlinks.html" . }}-->
+		{{ partial "graph.html" . }}
+		<aside id="page-connections" data-page-url="{{ .RelPermalink }}">
+		<section id="backlinks-panel">
+		  <h3>Backlinks</h3>
+		  <ul id="backlinks-list">
+		    <li>Loading backlinks...</li>
+		  </ul>
+		</section>
 
-                        <section id="local-graph-panel">
-                        <h3>Connected Pages</h3>
-                        <ul id="local-graph-list">
-                                <li>Loading connections...</li>
-                        </ul>
-                        </section>
-                </aside>
-                
-                <br/>
-                <br/>
-                <br/>
+		<section id="local-graph-panel">
+		  <h3>Connected Pages</h3>
+		  <ul id="local-graph-list">
+		    <li>Loading connections...</li>
+		  </ul>
+		</section>
+	      </aside>
+	      {{- with resources.Get "js/connections.js" }}
+		{{- $js := . | js.Build (dict "minify" (not hugo.IsDevelopment)) }}
+		<script src="{{ $js.RelPermalink }}" defer></script>
+	      {{- end }}
 
-                {{- if .Params.tags }}
-                <footer class="post__footer">
-                        {{ partial "post_tags.html" . }}
-                </footer>
-                {{- end }}
-        </article>
+
+		<br/>
+		<br/>
+		<br/>
+
+		{{- if .Params.tags }}
+		<footer class="post__footer">
+			{{ partial "post_tags.html" . }}
+		</footer>
+		{{- end }}
+	</article>
 </main>
 {{ partial "authorbox.html" . }}
 {{ partial "pager.html" . }}
